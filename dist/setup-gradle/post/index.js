@@ -6690,7 +6690,7 @@ function restoreCacheV2(paths, primaryKey, restoreKeys, options, enableCrossOsAr
             };
             const response = yield twirpClient.GetCacheEntryDownloadURL(request);
             if (!response.ok) {
-                core.warning(`Cache not found for keys: ${keys.join(', ')}`);
+                core.debug(`Cache not found for keys: ${keys.join(', ')}`);
                 return undefined;
             }
             core.info(`Cache hit for: ${request.key}`);
@@ -6946,156 +6946,13 @@ class CacheEntry {
 
 /***/ }),
 
-/***/ 28200:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Timestamp = void 0;
-const runtime_1 = __nccwpck_require__(68886);
-const runtime_2 = __nccwpck_require__(68886);
-const runtime_3 = __nccwpck_require__(68886);
-const runtime_4 = __nccwpck_require__(68886);
-const runtime_5 = __nccwpck_require__(68886);
-const runtime_6 = __nccwpck_require__(68886);
-const runtime_7 = __nccwpck_require__(68886);
-// @generated message type with reflection information, may provide speed optimized methods
-class Timestamp$Type extends runtime_7.MessageType {
-    constructor() {
-        super("google.protobuf.Timestamp", [
-            { no: 1, name: "seconds", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
-            { no: 2, name: "nanos", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
-        ]);
-    }
-    /**
-     * Creates a new `Timestamp` for the current time.
-     */
-    now() {
-        const msg = this.create();
-        const ms = Date.now();
-        msg.seconds = runtime_6.PbLong.from(Math.floor(ms / 1000)).toString();
-        msg.nanos = (ms % 1000) * 1000000;
-        return msg;
-    }
-    /**
-     * Converts a `Timestamp` to a JavaScript Date.
-     */
-    toDate(message) {
-        return new Date(runtime_6.PbLong.from(message.seconds).toNumber() * 1000 + Math.ceil(message.nanos / 1000000));
-    }
-    /**
-     * Converts a JavaScript Date to a `Timestamp`.
-     */
-    fromDate(date) {
-        const msg = this.create();
-        const ms = date.getTime();
-        msg.seconds = runtime_6.PbLong.from(Math.floor(ms / 1000)).toString();
-        msg.nanos = (ms % 1000) * 1000000;
-        return msg;
-    }
-    /**
-     * In JSON format, the `Timestamp` type is encoded as a string
-     * in the RFC 3339 format.
-     */
-    internalJsonWrite(message, options) {
-        let ms = runtime_6.PbLong.from(message.seconds).toNumber() * 1000;
-        if (ms < Date.parse("0001-01-01T00:00:00Z") || ms > Date.parse("9999-12-31T23:59:59Z"))
-            throw new Error("Unable to encode Timestamp to JSON. Must be from 0001-01-01T00:00:00Z to 9999-12-31T23:59:59Z inclusive.");
-        if (message.nanos < 0)
-            throw new Error("Unable to encode invalid Timestamp to JSON. Nanos must not be negative.");
-        let z = "Z";
-        if (message.nanos > 0) {
-            let nanosStr = (message.nanos + 1000000000).toString().substring(1);
-            if (nanosStr.substring(3) === "000000")
-                z = "." + nanosStr.substring(0, 3) + "Z";
-            else if (nanosStr.substring(6) === "000")
-                z = "." + nanosStr.substring(0, 6) + "Z";
-            else
-                z = "." + nanosStr + "Z";
-        }
-        return new Date(ms).toISOString().replace(".000Z", z);
-    }
-    /**
-     * In JSON format, the `Timestamp` type is encoded as a string
-     * in the RFC 3339 format.
-     */
-    internalJsonRead(json, options, target) {
-        if (typeof json !== "string")
-            throw new Error("Unable to parse Timestamp from JSON " + (0, runtime_5.typeofJsonValue)(json) + ".");
-        let matches = json.match(/^([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})(?:Z|\.([0-9]{3,9})Z|([+-][0-9][0-9]:[0-9][0-9]))$/);
-        if (!matches)
-            throw new Error("Unable to parse Timestamp from JSON. Invalid format.");
-        let ms = Date.parse(matches[1] + "-" + matches[2] + "-" + matches[3] + "T" + matches[4] + ":" + matches[5] + ":" + matches[6] + (matches[8] ? matches[8] : "Z"));
-        if (Number.isNaN(ms))
-            throw new Error("Unable to parse Timestamp from JSON. Invalid value.");
-        if (ms < Date.parse("0001-01-01T00:00:00Z") || ms > Date.parse("9999-12-31T23:59:59Z"))
-            throw new globalThis.Error("Unable to parse Timestamp from JSON. Must be from 0001-01-01T00:00:00Z to 9999-12-31T23:59:59Z inclusive.");
-        if (!target)
-            target = this.create();
-        target.seconds = runtime_6.PbLong.from(ms / 1000).toString();
-        target.nanos = 0;
-        if (matches[7])
-            target.nanos = (parseInt("1" + matches[7] + "0".repeat(9 - matches[7].length)) - 1000000000);
-        return target;
-    }
-    create(value) {
-        const message = { seconds: "0", nanos: 0 };
-        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            (0, runtime_3.reflectionMergePartial)(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* int64 seconds */ 1:
-                    message.seconds = reader.int64().toString();
-                    break;
-                case /* int32 nanos */ 2:
-                    message.nanos = reader.int32();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* int64 seconds = 1; */
-        if (message.seconds !== "0")
-            writer.tag(1, runtime_1.WireType.Varint).int64(message.seconds);
-        /* int32 nanos = 2; */
-        if (message.nanos !== 0)
-            writer.tag(2, runtime_1.WireType.Varint).int32(message.nanos);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message google.protobuf.Timestamp
- */
-exports.Timestamp = new Timestamp$Type();
-//# sourceMappingURL=timestamp.js.map
-
-/***/ }),
-
 /***/ 93156:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CacheService = exports.LookupCacheEntryResponse = exports.LookupCacheEntryRequest = exports.ListCacheEntriesResponse = exports.ListCacheEntriesRequest = exports.DeleteCacheEntryResponse = exports.DeleteCacheEntryRequest = exports.GetCacheEntryDownloadURLResponse = exports.GetCacheEntryDownloadURLRequest = exports.FinalizeCacheEntryUploadResponse = exports.FinalizeCacheEntryUploadRequest = exports.CreateCacheEntryResponse = exports.CreateCacheEntryRequest = void 0;
+exports.CacheService = exports.GetCacheEntryDownloadURLResponse = exports.GetCacheEntryDownloadURLRequest = exports.FinalizeCacheEntryUploadResponse = exports.FinalizeCacheEntryUploadRequest = exports.CreateCacheEntryResponse = exports.CreateCacheEntryRequest = void 0;
 // @generated by protobuf-ts 2.9.1 with parameter long_type_string,client_none,generate_dependencies
 // @generated from protobuf file "results/api/v1/cache.proto" (package "github.actions.results.api.v1", syntax proto3)
 // tslint:disable
@@ -7105,7 +6962,6 @@ const runtime_2 = __nccwpck_require__(68886);
 const runtime_3 = __nccwpck_require__(68886);
 const runtime_4 = __nccwpck_require__(68886);
 const runtime_5 = __nccwpck_require__(68886);
-const cacheentry_1 = __nccwpck_require__(55893);
 const cachemetadata_1 = __nccwpck_require__(89444);
 // @generated message type with reflection information, may provide speed optimized methods
 class CreateCacheEntryRequest$Type extends runtime_5.MessageType {
@@ -7473,376 +7329,25 @@ class GetCacheEntryDownloadURLResponse$Type extends runtime_5.MessageType {
  * @generated MessageType for protobuf message github.actions.results.api.v1.GetCacheEntryDownloadURLResponse
  */
 exports.GetCacheEntryDownloadURLResponse = new GetCacheEntryDownloadURLResponse$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class DeleteCacheEntryRequest$Type extends runtime_5.MessageType {
-    constructor() {
-        super("github.actions.results.api.v1.DeleteCacheEntryRequest", [
-            { no: 1, name: "metadata", kind: "message", T: () => cachemetadata_1.CacheMetadata },
-            { no: 2, name: "key", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
-        ]);
-    }
-    create(value) {
-        const message = { key: "" };
-        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            (0, runtime_3.reflectionMergePartial)(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* github.actions.results.entities.v1.CacheMetadata metadata */ 1:
-                    message.metadata = cachemetadata_1.CacheMetadata.internalBinaryRead(reader, reader.uint32(), options, message.metadata);
-                    break;
-                case /* string key */ 2:
-                    message.key = reader.string();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* github.actions.results.entities.v1.CacheMetadata metadata = 1; */
-        if (message.metadata)
-            cachemetadata_1.CacheMetadata.internalBinaryWrite(message.metadata, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* string key = 2; */
-        if (message.key !== "")
-            writer.tag(2, runtime_1.WireType.LengthDelimited).string(message.key);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message github.actions.results.api.v1.DeleteCacheEntryRequest
- */
-exports.DeleteCacheEntryRequest = new DeleteCacheEntryRequest$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class DeleteCacheEntryResponse$Type extends runtime_5.MessageType {
-    constructor() {
-        super("github.actions.results.api.v1.DeleteCacheEntryResponse", [
-            { no: 1, name: "ok", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "entry_id", kind: "scalar", T: 3 /*ScalarType.INT64*/ }
-        ]);
-    }
-    create(value) {
-        const message = { ok: false, entryId: "0" };
-        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            (0, runtime_3.reflectionMergePartial)(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* bool ok */ 1:
-                    message.ok = reader.bool();
-                    break;
-                case /* int64 entry_id */ 2:
-                    message.entryId = reader.int64().toString();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* bool ok = 1; */
-        if (message.ok !== false)
-            writer.tag(1, runtime_1.WireType.Varint).bool(message.ok);
-        /* int64 entry_id = 2; */
-        if (message.entryId !== "0")
-            writer.tag(2, runtime_1.WireType.Varint).int64(message.entryId);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message github.actions.results.api.v1.DeleteCacheEntryResponse
- */
-exports.DeleteCacheEntryResponse = new DeleteCacheEntryResponse$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class ListCacheEntriesRequest$Type extends runtime_5.MessageType {
-    constructor() {
-        super("github.actions.results.api.v1.ListCacheEntriesRequest", [
-            { no: 1, name: "metadata", kind: "message", T: () => cachemetadata_1.CacheMetadata },
-            { no: 2, name: "key", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "restore_keys", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
-        ]);
-    }
-    create(value) {
-        const message = { key: "", restoreKeys: [] };
-        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            (0, runtime_3.reflectionMergePartial)(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* github.actions.results.entities.v1.CacheMetadata metadata */ 1:
-                    message.metadata = cachemetadata_1.CacheMetadata.internalBinaryRead(reader, reader.uint32(), options, message.metadata);
-                    break;
-                case /* string key */ 2:
-                    message.key = reader.string();
-                    break;
-                case /* repeated string restore_keys */ 3:
-                    message.restoreKeys.push(reader.string());
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* github.actions.results.entities.v1.CacheMetadata metadata = 1; */
-        if (message.metadata)
-            cachemetadata_1.CacheMetadata.internalBinaryWrite(message.metadata, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* string key = 2; */
-        if (message.key !== "")
-            writer.tag(2, runtime_1.WireType.LengthDelimited).string(message.key);
-        /* repeated string restore_keys = 3; */
-        for (let i = 0; i < message.restoreKeys.length; i++)
-            writer.tag(3, runtime_1.WireType.LengthDelimited).string(message.restoreKeys[i]);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message github.actions.results.api.v1.ListCacheEntriesRequest
- */
-exports.ListCacheEntriesRequest = new ListCacheEntriesRequest$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class ListCacheEntriesResponse$Type extends runtime_5.MessageType {
-    constructor() {
-        super("github.actions.results.api.v1.ListCacheEntriesResponse", [
-            { no: 1, name: "entries", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => cacheentry_1.CacheEntry }
-        ]);
-    }
-    create(value) {
-        const message = { entries: [] };
-        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            (0, runtime_3.reflectionMergePartial)(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* repeated github.actions.results.entities.v1.CacheEntry entries */ 1:
-                    message.entries.push(cacheentry_1.CacheEntry.internalBinaryRead(reader, reader.uint32(), options));
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* repeated github.actions.results.entities.v1.CacheEntry entries = 1; */
-        for (let i = 0; i < message.entries.length; i++)
-            cacheentry_1.CacheEntry.internalBinaryWrite(message.entries[i], writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message github.actions.results.api.v1.ListCacheEntriesResponse
- */
-exports.ListCacheEntriesResponse = new ListCacheEntriesResponse$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class LookupCacheEntryRequest$Type extends runtime_5.MessageType {
-    constructor() {
-        super("github.actions.results.api.v1.LookupCacheEntryRequest", [
-            { no: 1, name: "metadata", kind: "message", T: () => cachemetadata_1.CacheMetadata },
-            { no: 2, name: "key", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "restore_keys", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "version", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
-        ]);
-    }
-    create(value) {
-        const message = { key: "", restoreKeys: [], version: "" };
-        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            (0, runtime_3.reflectionMergePartial)(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* github.actions.results.entities.v1.CacheMetadata metadata */ 1:
-                    message.metadata = cachemetadata_1.CacheMetadata.internalBinaryRead(reader, reader.uint32(), options, message.metadata);
-                    break;
-                case /* string key */ 2:
-                    message.key = reader.string();
-                    break;
-                case /* repeated string restore_keys */ 3:
-                    message.restoreKeys.push(reader.string());
-                    break;
-                case /* string version */ 4:
-                    message.version = reader.string();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* github.actions.results.entities.v1.CacheMetadata metadata = 1; */
-        if (message.metadata)
-            cachemetadata_1.CacheMetadata.internalBinaryWrite(message.metadata, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* string key = 2; */
-        if (message.key !== "")
-            writer.tag(2, runtime_1.WireType.LengthDelimited).string(message.key);
-        /* repeated string restore_keys = 3; */
-        for (let i = 0; i < message.restoreKeys.length; i++)
-            writer.tag(3, runtime_1.WireType.LengthDelimited).string(message.restoreKeys[i]);
-        /* string version = 4; */
-        if (message.version !== "")
-            writer.tag(4, runtime_1.WireType.LengthDelimited).string(message.version);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message github.actions.results.api.v1.LookupCacheEntryRequest
- */
-exports.LookupCacheEntryRequest = new LookupCacheEntryRequest$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class LookupCacheEntryResponse$Type extends runtime_5.MessageType {
-    constructor() {
-        super("github.actions.results.api.v1.LookupCacheEntryResponse", [
-            { no: 1, name: "exists", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "entry", kind: "message", T: () => cacheentry_1.CacheEntry }
-        ]);
-    }
-    create(value) {
-        const message = { exists: false };
-        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            (0, runtime_3.reflectionMergePartial)(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* bool exists */ 1:
-                    message.exists = reader.bool();
-                    break;
-                case /* github.actions.results.entities.v1.CacheEntry entry */ 2:
-                    message.entry = cacheentry_1.CacheEntry.internalBinaryRead(reader, reader.uint32(), options, message.entry);
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* bool exists = 1; */
-        if (message.exists !== false)
-            writer.tag(1, runtime_1.WireType.Varint).bool(message.exists);
-        /* github.actions.results.entities.v1.CacheEntry entry = 2; */
-        if (message.entry)
-            cacheentry_1.CacheEntry.internalBinaryWrite(message.entry, writer.tag(2, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message github.actions.results.api.v1.LookupCacheEntryResponse
- */
-exports.LookupCacheEntryResponse = new LookupCacheEntryResponse$Type();
 /**
  * @generated ServiceType for protobuf service github.actions.results.api.v1.CacheService
  */
 exports.CacheService = new runtime_rpc_1.ServiceType("github.actions.results.api.v1.CacheService", [
     { name: "CreateCacheEntry", options: {}, I: exports.CreateCacheEntryRequest, O: exports.CreateCacheEntryResponse },
     { name: "FinalizeCacheEntryUpload", options: {}, I: exports.FinalizeCacheEntryUploadRequest, O: exports.FinalizeCacheEntryUploadResponse },
-    { name: "GetCacheEntryDownloadURL", options: {}, I: exports.GetCacheEntryDownloadURLRequest, O: exports.GetCacheEntryDownloadURLResponse },
-    { name: "DeleteCacheEntry", options: {}, I: exports.DeleteCacheEntryRequest, O: exports.DeleteCacheEntryResponse },
-    { name: "ListCacheEntries", options: {}, I: exports.ListCacheEntriesRequest, O: exports.ListCacheEntriesResponse },
-    { name: "LookupCacheEntry", options: {}, I: exports.LookupCacheEntryRequest, O: exports.LookupCacheEntryResponse }
+    { name: "GetCacheEntryDownloadURL", options: {}, I: exports.GetCacheEntryDownloadURLRequest, O: exports.GetCacheEntryDownloadURLResponse }
 ]);
 //# sourceMappingURL=cache.js.map
 
 /***/ }),
 
-/***/ 80564:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ 11486:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createCacheServiceServer = exports.CacheServiceMethodList = exports.CacheServiceMethod = exports.CacheServiceClientProtobuf = exports.CacheServiceClientJSON = void 0;
-const twirp_ts_1 = __nccwpck_require__(30430);
+exports.CacheServiceClientProtobuf = exports.CacheServiceClientJSON = void 0;
 const cache_1 = __nccwpck_require__(93156);
 class CacheServiceClientJSON {
     constructor(rpc) {
@@ -7850,9 +7355,6 @@ class CacheServiceClientJSON {
         this.CreateCacheEntry.bind(this);
         this.FinalizeCacheEntryUpload.bind(this);
         this.GetCacheEntryDownloadURL.bind(this);
-        this.DeleteCacheEntry.bind(this);
-        this.ListCacheEntries.bind(this);
-        this.LookupCacheEntry.bind(this);
     }
     CreateCacheEntry(request) {
         const data = cache_1.CreateCacheEntryRequest.toJson(request, {
@@ -7884,36 +7386,6 @@ class CacheServiceClientJSON {
             ignoreUnknownFields: true,
         }));
     }
-    DeleteCacheEntry(request) {
-        const data = cache_1.DeleteCacheEntryRequest.toJson(request, {
-            useProtoFieldName: true,
-            emitDefaultValues: false,
-        });
-        const promise = this.rpc.request("github.actions.results.api.v1.CacheService", "DeleteCacheEntry", "application/json", data);
-        return promise.then((data) => cache_1.DeleteCacheEntryResponse.fromJson(data, {
-            ignoreUnknownFields: true,
-        }));
-    }
-    ListCacheEntries(request) {
-        const data = cache_1.ListCacheEntriesRequest.toJson(request, {
-            useProtoFieldName: true,
-            emitDefaultValues: false,
-        });
-        const promise = this.rpc.request("github.actions.results.api.v1.CacheService", "ListCacheEntries", "application/json", data);
-        return promise.then((data) => cache_1.ListCacheEntriesResponse.fromJson(data, {
-            ignoreUnknownFields: true,
-        }));
-    }
-    LookupCacheEntry(request) {
-        const data = cache_1.LookupCacheEntryRequest.toJson(request, {
-            useProtoFieldName: true,
-            emitDefaultValues: false,
-        });
-        const promise = this.rpc.request("github.actions.results.api.v1.CacheService", "LookupCacheEntry", "application/json", data);
-        return promise.then((data) => cache_1.LookupCacheEntryResponse.fromJson(data, {
-            ignoreUnknownFields: true,
-        }));
-    }
 }
 exports.CacheServiceClientJSON = CacheServiceClientJSON;
 class CacheServiceClientProtobuf {
@@ -7922,9 +7394,6 @@ class CacheServiceClientProtobuf {
         this.CreateCacheEntry.bind(this);
         this.FinalizeCacheEntryUpload.bind(this);
         this.GetCacheEntryDownloadURL.bind(this);
-        this.DeleteCacheEntry.bind(this);
-        this.ListCacheEntries.bind(this);
-        this.LookupCacheEntry.bind(this);
     }
     CreateCacheEntry(request) {
         const data = cache_1.CreateCacheEntryRequest.toBinary(request);
@@ -7941,610 +7410,9 @@ class CacheServiceClientProtobuf {
         const promise = this.rpc.request("github.actions.results.api.v1.CacheService", "GetCacheEntryDownloadURL", "application/protobuf", data);
         return promise.then((data) => cache_1.GetCacheEntryDownloadURLResponse.fromBinary(data));
     }
-    DeleteCacheEntry(request) {
-        const data = cache_1.DeleteCacheEntryRequest.toBinary(request);
-        const promise = this.rpc.request("github.actions.results.api.v1.CacheService", "DeleteCacheEntry", "application/protobuf", data);
-        return promise.then((data) => cache_1.DeleteCacheEntryResponse.fromBinary(data));
-    }
-    ListCacheEntries(request) {
-        const data = cache_1.ListCacheEntriesRequest.toBinary(request);
-        const promise = this.rpc.request("github.actions.results.api.v1.CacheService", "ListCacheEntries", "application/protobuf", data);
-        return promise.then((data) => cache_1.ListCacheEntriesResponse.fromBinary(data));
-    }
-    LookupCacheEntry(request) {
-        const data = cache_1.LookupCacheEntryRequest.toBinary(request);
-        const promise = this.rpc.request("github.actions.results.api.v1.CacheService", "LookupCacheEntry", "application/protobuf", data);
-        return promise.then((data) => cache_1.LookupCacheEntryResponse.fromBinary(data));
-    }
 }
 exports.CacheServiceClientProtobuf = CacheServiceClientProtobuf;
-var CacheServiceMethod;
-(function (CacheServiceMethod) {
-    CacheServiceMethod["CreateCacheEntry"] = "CreateCacheEntry";
-    CacheServiceMethod["FinalizeCacheEntryUpload"] = "FinalizeCacheEntryUpload";
-    CacheServiceMethod["GetCacheEntryDownloadURL"] = "GetCacheEntryDownloadURL";
-    CacheServiceMethod["DeleteCacheEntry"] = "DeleteCacheEntry";
-    CacheServiceMethod["ListCacheEntries"] = "ListCacheEntries";
-    CacheServiceMethod["LookupCacheEntry"] = "LookupCacheEntry";
-})(CacheServiceMethod || (exports.CacheServiceMethod = CacheServiceMethod = {}));
-exports.CacheServiceMethodList = [
-    CacheServiceMethod.CreateCacheEntry,
-    CacheServiceMethod.FinalizeCacheEntryUpload,
-    CacheServiceMethod.GetCacheEntryDownloadURL,
-    CacheServiceMethod.DeleteCacheEntry,
-    CacheServiceMethod.ListCacheEntries,
-    CacheServiceMethod.LookupCacheEntry,
-];
-function createCacheServiceServer(service) {
-    return new twirp_ts_1.TwirpServer({
-        service,
-        packageName: "github.actions.results.api.v1",
-        serviceName: "CacheService",
-        methodList: exports.CacheServiceMethodList,
-        matchRoute: matchCacheServiceRoute,
-    });
-}
-exports.createCacheServiceServer = createCacheServiceServer;
-function matchCacheServiceRoute(method, events) {
-    switch (method) {
-        case "CreateCacheEntry":
-            return (ctx, service, data, interceptors) => __awaiter(this, void 0, void 0, function* () {
-                ctx = Object.assign(Object.assign({}, ctx), { methodName: "CreateCacheEntry" });
-                yield events.onMatch(ctx);
-                return handleCacheServiceCreateCacheEntryRequest(ctx, service, data, interceptors);
-            });
-        case "FinalizeCacheEntryUpload":
-            return (ctx, service, data, interceptors) => __awaiter(this, void 0, void 0, function* () {
-                ctx = Object.assign(Object.assign({}, ctx), { methodName: "FinalizeCacheEntryUpload" });
-                yield events.onMatch(ctx);
-                return handleCacheServiceFinalizeCacheEntryUploadRequest(ctx, service, data, interceptors);
-            });
-        case "GetCacheEntryDownloadURL":
-            return (ctx, service, data, interceptors) => __awaiter(this, void 0, void 0, function* () {
-                ctx = Object.assign(Object.assign({}, ctx), { methodName: "GetCacheEntryDownloadURL" });
-                yield events.onMatch(ctx);
-                return handleCacheServiceGetCacheEntryDownloadURLRequest(ctx, service, data, interceptors);
-            });
-        case "DeleteCacheEntry":
-            return (ctx, service, data, interceptors) => __awaiter(this, void 0, void 0, function* () {
-                ctx = Object.assign(Object.assign({}, ctx), { methodName: "DeleteCacheEntry" });
-                yield events.onMatch(ctx);
-                return handleCacheServiceDeleteCacheEntryRequest(ctx, service, data, interceptors);
-            });
-        case "ListCacheEntries":
-            return (ctx, service, data, interceptors) => __awaiter(this, void 0, void 0, function* () {
-                ctx = Object.assign(Object.assign({}, ctx), { methodName: "ListCacheEntries" });
-                yield events.onMatch(ctx);
-                return handleCacheServiceListCacheEntriesRequest(ctx, service, data, interceptors);
-            });
-        case "LookupCacheEntry":
-            return (ctx, service, data, interceptors) => __awaiter(this, void 0, void 0, function* () {
-                ctx = Object.assign(Object.assign({}, ctx), { methodName: "LookupCacheEntry" });
-                yield events.onMatch(ctx);
-                return handleCacheServiceLookupCacheEntryRequest(ctx, service, data, interceptors);
-            });
-        default:
-            events.onNotFound();
-            const msg = `no handler found`;
-            throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.BadRoute, msg);
-    }
-}
-function handleCacheServiceCreateCacheEntryRequest(ctx, service, data, interceptors) {
-    switch (ctx.contentType) {
-        case twirp_ts_1.TwirpContentType.JSON:
-            return handleCacheServiceCreateCacheEntryJSON(ctx, service, data, interceptors);
-        case twirp_ts_1.TwirpContentType.Protobuf:
-            return handleCacheServiceCreateCacheEntryProtobuf(ctx, service, data, interceptors);
-        default:
-            const msg = "unexpected Content-Type";
-            throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.BadRoute, msg);
-    }
-}
-function handleCacheServiceFinalizeCacheEntryUploadRequest(ctx, service, data, interceptors) {
-    switch (ctx.contentType) {
-        case twirp_ts_1.TwirpContentType.JSON:
-            return handleCacheServiceFinalizeCacheEntryUploadJSON(ctx, service, data, interceptors);
-        case twirp_ts_1.TwirpContentType.Protobuf:
-            return handleCacheServiceFinalizeCacheEntryUploadProtobuf(ctx, service, data, interceptors);
-        default:
-            const msg = "unexpected Content-Type";
-            throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.BadRoute, msg);
-    }
-}
-function handleCacheServiceGetCacheEntryDownloadURLRequest(ctx, service, data, interceptors) {
-    switch (ctx.contentType) {
-        case twirp_ts_1.TwirpContentType.JSON:
-            return handleCacheServiceGetCacheEntryDownloadURLJSON(ctx, service, data, interceptors);
-        case twirp_ts_1.TwirpContentType.Protobuf:
-            return handleCacheServiceGetCacheEntryDownloadURLProtobuf(ctx, service, data, interceptors);
-        default:
-            const msg = "unexpected Content-Type";
-            throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.BadRoute, msg);
-    }
-}
-function handleCacheServiceDeleteCacheEntryRequest(ctx, service, data, interceptors) {
-    switch (ctx.contentType) {
-        case twirp_ts_1.TwirpContentType.JSON:
-            return handleCacheServiceDeleteCacheEntryJSON(ctx, service, data, interceptors);
-        case twirp_ts_1.TwirpContentType.Protobuf:
-            return handleCacheServiceDeleteCacheEntryProtobuf(ctx, service, data, interceptors);
-        default:
-            const msg = "unexpected Content-Type";
-            throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.BadRoute, msg);
-    }
-}
-function handleCacheServiceListCacheEntriesRequest(ctx, service, data, interceptors) {
-    switch (ctx.contentType) {
-        case twirp_ts_1.TwirpContentType.JSON:
-            return handleCacheServiceListCacheEntriesJSON(ctx, service, data, interceptors);
-        case twirp_ts_1.TwirpContentType.Protobuf:
-            return handleCacheServiceListCacheEntriesProtobuf(ctx, service, data, interceptors);
-        default:
-            const msg = "unexpected Content-Type";
-            throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.BadRoute, msg);
-    }
-}
-function handleCacheServiceLookupCacheEntryRequest(ctx, service, data, interceptors) {
-    switch (ctx.contentType) {
-        case twirp_ts_1.TwirpContentType.JSON:
-            return handleCacheServiceLookupCacheEntryJSON(ctx, service, data, interceptors);
-        case twirp_ts_1.TwirpContentType.Protobuf:
-            return handleCacheServiceLookupCacheEntryProtobuf(ctx, service, data, interceptors);
-        default:
-            const msg = "unexpected Content-Type";
-            throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.BadRoute, msg);
-    }
-}
-function handleCacheServiceCreateCacheEntryJSON(ctx, service, data, interceptors) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let request;
-        let response;
-        try {
-            const body = JSON.parse(data.toString() || "{}");
-            request = cache_1.CreateCacheEntryRequest.fromJson(body, {
-                ignoreUnknownFields: true,
-            });
-        }
-        catch (e) {
-            if (e instanceof Error) {
-                const msg = "the json request could not be decoded";
-                throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.Malformed, msg).withCause(e, true);
-            }
-        }
-        if (interceptors && interceptors.length > 0) {
-            const interceptor = (0, twirp_ts_1.chainInterceptors)(...interceptors);
-            response = yield interceptor(ctx, request, (ctx, inputReq) => {
-                return service.CreateCacheEntry(ctx, inputReq);
-            });
-        }
-        else {
-            response = yield service.CreateCacheEntry(ctx, request);
-        }
-        return JSON.stringify(cache_1.CreateCacheEntryResponse.toJson(response, {
-            useProtoFieldName: true,
-            emitDefaultValues: false,
-        }));
-    });
-}
-function handleCacheServiceFinalizeCacheEntryUploadJSON(ctx, service, data, interceptors) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let request;
-        let response;
-        try {
-            const body = JSON.parse(data.toString() || "{}");
-            request = cache_1.FinalizeCacheEntryUploadRequest.fromJson(body, {
-                ignoreUnknownFields: true,
-            });
-        }
-        catch (e) {
-            if (e instanceof Error) {
-                const msg = "the json request could not be decoded";
-                throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.Malformed, msg).withCause(e, true);
-            }
-        }
-        if (interceptors && interceptors.length > 0) {
-            const interceptor = (0, twirp_ts_1.chainInterceptors)(...interceptors);
-            response = yield interceptor(ctx, request, (ctx, inputReq) => {
-                return service.FinalizeCacheEntryUpload(ctx, inputReq);
-            });
-        }
-        else {
-            response = yield service.FinalizeCacheEntryUpload(ctx, request);
-        }
-        return JSON.stringify(cache_1.FinalizeCacheEntryUploadResponse.toJson(response, {
-            useProtoFieldName: true,
-            emitDefaultValues: false,
-        }));
-    });
-}
-function handleCacheServiceGetCacheEntryDownloadURLJSON(ctx, service, data, interceptors) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let request;
-        let response;
-        try {
-            const body = JSON.parse(data.toString() || "{}");
-            request = cache_1.GetCacheEntryDownloadURLRequest.fromJson(body, {
-                ignoreUnknownFields: true,
-            });
-        }
-        catch (e) {
-            if (e instanceof Error) {
-                const msg = "the json request could not be decoded";
-                throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.Malformed, msg).withCause(e, true);
-            }
-        }
-        if (interceptors && interceptors.length > 0) {
-            const interceptor = (0, twirp_ts_1.chainInterceptors)(...interceptors);
-            response = yield interceptor(ctx, request, (ctx, inputReq) => {
-                return service.GetCacheEntryDownloadURL(ctx, inputReq);
-            });
-        }
-        else {
-            response = yield service.GetCacheEntryDownloadURL(ctx, request);
-        }
-        return JSON.stringify(cache_1.GetCacheEntryDownloadURLResponse.toJson(response, {
-            useProtoFieldName: true,
-            emitDefaultValues: false,
-        }));
-    });
-}
-function handleCacheServiceDeleteCacheEntryJSON(ctx, service, data, interceptors) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let request;
-        let response;
-        try {
-            const body = JSON.parse(data.toString() || "{}");
-            request = cache_1.DeleteCacheEntryRequest.fromJson(body, {
-                ignoreUnknownFields: true,
-            });
-        }
-        catch (e) {
-            if (e instanceof Error) {
-                const msg = "the json request could not be decoded";
-                throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.Malformed, msg).withCause(e, true);
-            }
-        }
-        if (interceptors && interceptors.length > 0) {
-            const interceptor = (0, twirp_ts_1.chainInterceptors)(...interceptors);
-            response = yield interceptor(ctx, request, (ctx, inputReq) => {
-                return service.DeleteCacheEntry(ctx, inputReq);
-            });
-        }
-        else {
-            response = yield service.DeleteCacheEntry(ctx, request);
-        }
-        return JSON.stringify(cache_1.DeleteCacheEntryResponse.toJson(response, {
-            useProtoFieldName: true,
-            emitDefaultValues: false,
-        }));
-    });
-}
-function handleCacheServiceListCacheEntriesJSON(ctx, service, data, interceptors) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let request;
-        let response;
-        try {
-            const body = JSON.parse(data.toString() || "{}");
-            request = cache_1.ListCacheEntriesRequest.fromJson(body, {
-                ignoreUnknownFields: true,
-            });
-        }
-        catch (e) {
-            if (e instanceof Error) {
-                const msg = "the json request could not be decoded";
-                throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.Malformed, msg).withCause(e, true);
-            }
-        }
-        if (interceptors && interceptors.length > 0) {
-            const interceptor = (0, twirp_ts_1.chainInterceptors)(...interceptors);
-            response = yield interceptor(ctx, request, (ctx, inputReq) => {
-                return service.ListCacheEntries(ctx, inputReq);
-            });
-        }
-        else {
-            response = yield service.ListCacheEntries(ctx, request);
-        }
-        return JSON.stringify(cache_1.ListCacheEntriesResponse.toJson(response, {
-            useProtoFieldName: true,
-            emitDefaultValues: false,
-        }));
-    });
-}
-function handleCacheServiceLookupCacheEntryJSON(ctx, service, data, interceptors) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let request;
-        let response;
-        try {
-            const body = JSON.parse(data.toString() || "{}");
-            request = cache_1.LookupCacheEntryRequest.fromJson(body, {
-                ignoreUnknownFields: true,
-            });
-        }
-        catch (e) {
-            if (e instanceof Error) {
-                const msg = "the json request could not be decoded";
-                throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.Malformed, msg).withCause(e, true);
-            }
-        }
-        if (interceptors && interceptors.length > 0) {
-            const interceptor = (0, twirp_ts_1.chainInterceptors)(...interceptors);
-            response = yield interceptor(ctx, request, (ctx, inputReq) => {
-                return service.LookupCacheEntry(ctx, inputReq);
-            });
-        }
-        else {
-            response = yield service.LookupCacheEntry(ctx, request);
-        }
-        return JSON.stringify(cache_1.LookupCacheEntryResponse.toJson(response, {
-            useProtoFieldName: true,
-            emitDefaultValues: false,
-        }));
-    });
-}
-function handleCacheServiceCreateCacheEntryProtobuf(ctx, service, data, interceptors) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let request;
-        let response;
-        try {
-            request = cache_1.CreateCacheEntryRequest.fromBinary(data);
-        }
-        catch (e) {
-            if (e instanceof Error) {
-                const msg = "the protobuf request could not be decoded";
-                throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.Malformed, msg).withCause(e, true);
-            }
-        }
-        if (interceptors && interceptors.length > 0) {
-            const interceptor = (0, twirp_ts_1.chainInterceptors)(...interceptors);
-            response = yield interceptor(ctx, request, (ctx, inputReq) => {
-                return service.CreateCacheEntry(ctx, inputReq);
-            });
-        }
-        else {
-            response = yield service.CreateCacheEntry(ctx, request);
-        }
-        return Buffer.from(cache_1.CreateCacheEntryResponse.toBinary(response));
-    });
-}
-function handleCacheServiceFinalizeCacheEntryUploadProtobuf(ctx, service, data, interceptors) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let request;
-        let response;
-        try {
-            request = cache_1.FinalizeCacheEntryUploadRequest.fromBinary(data);
-        }
-        catch (e) {
-            if (e instanceof Error) {
-                const msg = "the protobuf request could not be decoded";
-                throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.Malformed, msg).withCause(e, true);
-            }
-        }
-        if (interceptors && interceptors.length > 0) {
-            const interceptor = (0, twirp_ts_1.chainInterceptors)(...interceptors);
-            response = yield interceptor(ctx, request, (ctx, inputReq) => {
-                return service.FinalizeCacheEntryUpload(ctx, inputReq);
-            });
-        }
-        else {
-            response = yield service.FinalizeCacheEntryUpload(ctx, request);
-        }
-        return Buffer.from(cache_1.FinalizeCacheEntryUploadResponse.toBinary(response));
-    });
-}
-function handleCacheServiceGetCacheEntryDownloadURLProtobuf(ctx, service, data, interceptors) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let request;
-        let response;
-        try {
-            request = cache_1.GetCacheEntryDownloadURLRequest.fromBinary(data);
-        }
-        catch (e) {
-            if (e instanceof Error) {
-                const msg = "the protobuf request could not be decoded";
-                throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.Malformed, msg).withCause(e, true);
-            }
-        }
-        if (interceptors && interceptors.length > 0) {
-            const interceptor = (0, twirp_ts_1.chainInterceptors)(...interceptors);
-            response = yield interceptor(ctx, request, (ctx, inputReq) => {
-                return service.GetCacheEntryDownloadURL(ctx, inputReq);
-            });
-        }
-        else {
-            response = yield service.GetCacheEntryDownloadURL(ctx, request);
-        }
-        return Buffer.from(cache_1.GetCacheEntryDownloadURLResponse.toBinary(response));
-    });
-}
-function handleCacheServiceDeleteCacheEntryProtobuf(ctx, service, data, interceptors) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let request;
-        let response;
-        try {
-            request = cache_1.DeleteCacheEntryRequest.fromBinary(data);
-        }
-        catch (e) {
-            if (e instanceof Error) {
-                const msg = "the protobuf request could not be decoded";
-                throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.Malformed, msg).withCause(e, true);
-            }
-        }
-        if (interceptors && interceptors.length > 0) {
-            const interceptor = (0, twirp_ts_1.chainInterceptors)(...interceptors);
-            response = yield interceptor(ctx, request, (ctx, inputReq) => {
-                return service.DeleteCacheEntry(ctx, inputReq);
-            });
-        }
-        else {
-            response = yield service.DeleteCacheEntry(ctx, request);
-        }
-        return Buffer.from(cache_1.DeleteCacheEntryResponse.toBinary(response));
-    });
-}
-function handleCacheServiceListCacheEntriesProtobuf(ctx, service, data, interceptors) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let request;
-        let response;
-        try {
-            request = cache_1.ListCacheEntriesRequest.fromBinary(data);
-        }
-        catch (e) {
-            if (e instanceof Error) {
-                const msg = "the protobuf request could not be decoded";
-                throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.Malformed, msg).withCause(e, true);
-            }
-        }
-        if (interceptors && interceptors.length > 0) {
-            const interceptor = (0, twirp_ts_1.chainInterceptors)(...interceptors);
-            response = yield interceptor(ctx, request, (ctx, inputReq) => {
-                return service.ListCacheEntries(ctx, inputReq);
-            });
-        }
-        else {
-            response = yield service.ListCacheEntries(ctx, request);
-        }
-        return Buffer.from(cache_1.ListCacheEntriesResponse.toBinary(response));
-    });
-}
-function handleCacheServiceLookupCacheEntryProtobuf(ctx, service, data, interceptors) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let request;
-        let response;
-        try {
-            request = cache_1.LookupCacheEntryRequest.fromBinary(data);
-        }
-        catch (e) {
-            if (e instanceof Error) {
-                const msg = "the protobuf request could not be decoded";
-                throw new twirp_ts_1.TwirpError(twirp_ts_1.TwirpErrorCode.Malformed, msg).withCause(e, true);
-            }
-        }
-        if (interceptors && interceptors.length > 0) {
-            const interceptor = (0, twirp_ts_1.chainInterceptors)(...interceptors);
-            response = yield interceptor(ctx, request, (ctx, inputReq) => {
-                return service.LookupCacheEntry(ctx, inputReq);
-            });
-        }
-        else {
-            response = yield service.LookupCacheEntry(ctx, request);
-        }
-        return Buffer.from(cache_1.LookupCacheEntryResponse.toBinary(response));
-    });
-}
-//# sourceMappingURL=cache.twirp.js.map
-
-/***/ }),
-
-/***/ 55893:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CacheEntry = void 0;
-const runtime_1 = __nccwpck_require__(68886);
-const runtime_2 = __nccwpck_require__(68886);
-const runtime_3 = __nccwpck_require__(68886);
-const runtime_4 = __nccwpck_require__(68886);
-const runtime_5 = __nccwpck_require__(68886);
-const timestamp_1 = __nccwpck_require__(28200);
-// @generated message type with reflection information, may provide speed optimized methods
-class CacheEntry$Type extends runtime_5.MessageType {
-    constructor() {
-        super("github.actions.results.entities.v1.CacheEntry", [
-            { no: 1, name: "key", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "hash", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "size_bytes", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
-            { no: 4, name: "scope", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 5, name: "version", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 6, name: "created_at", kind: "message", T: () => timestamp_1.Timestamp },
-            { no: 7, name: "last_accessed_at", kind: "message", T: () => timestamp_1.Timestamp },
-            { no: 8, name: "expires_at", kind: "message", T: () => timestamp_1.Timestamp }
-        ]);
-    }
-    create(value) {
-        const message = { key: "", hash: "", sizeBytes: "0", scope: "", version: "" };
-        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            (0, runtime_3.reflectionMergePartial)(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* string key */ 1:
-                    message.key = reader.string();
-                    break;
-                case /* string hash */ 2:
-                    message.hash = reader.string();
-                    break;
-                case /* int64 size_bytes */ 3:
-                    message.sizeBytes = reader.int64().toString();
-                    break;
-                case /* string scope */ 4:
-                    message.scope = reader.string();
-                    break;
-                case /* string version */ 5:
-                    message.version = reader.string();
-                    break;
-                case /* google.protobuf.Timestamp created_at */ 6:
-                    message.createdAt = timestamp_1.Timestamp.internalBinaryRead(reader, reader.uint32(), options, message.createdAt);
-                    break;
-                case /* google.protobuf.Timestamp last_accessed_at */ 7:
-                    message.lastAccessedAt = timestamp_1.Timestamp.internalBinaryRead(reader, reader.uint32(), options, message.lastAccessedAt);
-                    break;
-                case /* google.protobuf.Timestamp expires_at */ 8:
-                    message.expiresAt = timestamp_1.Timestamp.internalBinaryRead(reader, reader.uint32(), options, message.expiresAt);
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* string key = 1; */
-        if (message.key !== "")
-            writer.tag(1, runtime_1.WireType.LengthDelimited).string(message.key);
-        /* string hash = 2; */
-        if (message.hash !== "")
-            writer.tag(2, runtime_1.WireType.LengthDelimited).string(message.hash);
-        /* int64 size_bytes = 3; */
-        if (message.sizeBytes !== "0")
-            writer.tag(3, runtime_1.WireType.Varint).int64(message.sizeBytes);
-        /* string scope = 4; */
-        if (message.scope !== "")
-            writer.tag(4, runtime_1.WireType.LengthDelimited).string(message.scope);
-        /* string version = 5; */
-        if (message.version !== "")
-            writer.tag(5, runtime_1.WireType.LengthDelimited).string(message.version);
-        /* google.protobuf.Timestamp created_at = 6; */
-        if (message.createdAt)
-            timestamp_1.Timestamp.internalBinaryWrite(message.createdAt, writer.tag(6, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* google.protobuf.Timestamp last_accessed_at = 7; */
-        if (message.lastAccessedAt)
-            timestamp_1.Timestamp.internalBinaryWrite(message.lastAccessedAt, writer.tag(7, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* google.protobuf.Timestamp expires_at = 8; */
-        if (message.expiresAt)
-            timestamp_1.Timestamp.internalBinaryWrite(message.expiresAt, writer.tag(8, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message github.actions.results.entities.v1.CacheEntry
- */
-exports.CacheEntry = new CacheEntry$Type();
-//# sourceMappingURL=cacheentry.js.map
+//# sourceMappingURL=cache.twirp-client.js.map
 
 /***/ }),
 
@@ -9815,7 +8683,7 @@ const config_1 = __nccwpck_require__(17606);
 const cacheUtils_1 = __nccwpck_require__(98299);
 const auth_1 = __nccwpck_require__(44552);
 const http_client_1 = __nccwpck_require__(54844);
-const cache_twirp_1 = __nccwpck_require__(80564);
+const cache_twirp_client_1 = __nccwpck_require__(11486);
 /**
  * This class is a wrapper around the CacheServiceClientJSON class generated by Twirp.
  *
@@ -9952,7 +8820,7 @@ class CacheServiceClient {
 }
 function internalCacheTwirpClient(options) {
     const client = new CacheServiceClient((0, user_agent_1.getUserAgentString)(), options === null || options === void 0 ? void 0 : options.maxAttempts, options === null || options === void 0 ? void 0 : options.retryIntervalMs, options === null || options === void 0 ? void 0 : options.retryMultiplier);
-    return new cache_twirp_1.CacheServiceClientJSON(client);
+    return new cache_twirp_client_1.CacheServiceClientJSON(client);
 }
 exports.internalCacheTwirpClient = internalCacheTwirpClient;
 //# sourceMappingURL=cacheTwirpClient.js.map
@@ -144008,7 +142876,7 @@ const testSet = (set, version, options) => {
 
 const debug = __nccwpck_require__(1159)
 const { MAX_LENGTH, MAX_SAFE_INTEGER } = __nccwpck_require__(45101)
-const { safeRe: re, t } = __nccwpck_require__(95471)
+const { safeRe: re, safeSrc: src, t } = __nccwpck_require__(95471)
 
 const parseOptions = __nccwpck_require__(70356)
 const { compareIdentifiers } = __nccwpck_require__(73348)
@@ -144018,7 +142886,7 @@ class SemVer {
 
     if (version instanceof SemVer) {
       if (version.loose === !!options.loose &&
-          version.includePrerelease === !!options.includePrerelease) {
+        version.includePrerelease === !!options.includePrerelease) {
         return version
       } else {
         version = version.version
@@ -144184,6 +143052,20 @@ class SemVer {
   // preminor will bump the version up to the next minor release, and immediately
   // down to pre-release. premajor and prepatch work the same way.
   inc (release, identifier, identifierBase) {
+    if (release.startsWith('pre')) {
+      if (!identifier && identifierBase === false) {
+        throw new Error('invalid increment argument: identifier is empty')
+      }
+      // Avoid an invalid semver results
+      if (identifier) {
+        const r = new RegExp(`^${this.options.loose ? src[t.PRERELEASELOOSE] : src[t.PRERELEASE]}$`)
+        const match = `-${identifier}`.match(r)
+        if (!match || match[1] !== identifier) {
+          throw new Error(`invalid identifier: ${identifier}`)
+        }
+      }
+    }
+
     switch (release) {
       case 'premajor':
         this.prerelease.length = 0
@@ -144213,6 +143095,12 @@ class SemVer {
           this.inc('patch', identifier, identifierBase)
         }
         this.inc('pre', identifier, identifierBase)
+        break
+      case 'release':
+        if (this.prerelease.length === 0) {
+          throw new Error(`version ${this.raw} is not a prerelease`)
+        }
+        this.prerelease.length = 0
         break
 
       case 'major':
@@ -144256,10 +143144,6 @@ class SemVer {
       // 1.0.0 'pre' would become 1.0.0-0 which is the wrong direction.
       case 'pre': {
         const base = Number(identifierBase) ? 1 : 0
-
-        if (!identifier && identifierBase === false) {
-          throw new Error('invalid increment argument: identifier is empty')
-        }
 
         if (this.prerelease.length === 0) {
           this.prerelease = [base]
@@ -144519,20 +143403,13 @@ const diff = (version1, version2) => {
       return 'major'
     }
 
-    // Otherwise it can be determined by checking the high version
-
-    if (highVersion.patch) {
-      // anything higher than a patch bump would result in the wrong version
+    // If the main part has no difference
+    if (lowVersion.compareMain(highVersion) === 0) {
+      if (lowVersion.minor && !lowVersion.patch) {
+        return 'minor'
+      }
       return 'patch'
     }
-
-    if (highVersion.minor) {
-      // anything higher than a minor bump would result in the wrong version
-      return 'minor'
-    }
-
-    // bumping major/minor/patch all have same result
-    return 'major'
   }
 
   // add the `pre` prefix if we are going to a prerelease version
@@ -145039,6 +143916,7 @@ exports = module.exports = {}
 const re = exports.re = []
 const safeRe = exports.safeRe = []
 const src = exports.src = []
+const safeSrc = exports.safeSrc = []
 const t = exports.t = {}
 let R = 0
 
@@ -145071,6 +143949,7 @@ const createToken = (name, value, isGlobal) => {
   debug(name, index, value)
   t[name] = index
   src[index] = value
+  safeSrc[index] = safe
   re[index] = new RegExp(value, isGlobal ? 'g' : undefined)
   safeRe[index] = new RegExp(safe, isGlobal ? 'g' : undefined)
 }
@@ -185317,7 +184196,7 @@ async function setup(config) {
         maybeExportVariable('DEVELOCITY_TERMS_OF_USE_URL', config.getBuildScanTermsOfUseUrl());
         maybeExportVariable('DEVELOCITY_TERMS_OF_USE_AGREE', config.getBuildScanTermsOfUseAgree());
     }
-    return (0, short_lived_token_1.setupToken)(config.getDevelocityAccessKey(), config.getDevelocityTokenExpiry());
+    return (0, short_lived_token_1.setupToken)(config.getDevelocityAccessKey(), config.getDevelocityTokenExpiry(), config.getDevelocityAllowUntrustedServer());
 }
 function maybeExportVariable(variableName, value) {
     if (!process.env[variableName]) {
@@ -185379,11 +184258,11 @@ const httpm = __importStar(__nccwpck_require__(96184));
 const core = __importStar(__nccwpck_require__(37484));
 const configuration_1 = __nccwpck_require__(66081);
 const deprecation_collector_1 = __nccwpck_require__(18391);
-async function setupToken(develocityAccessKey, develocityTokenExpiry) {
+async function setupToken(develocityAccessKey, develocityTokenExpiry, develocityAllowUntrustedServer) {
     if (develocityAccessKey) {
         try {
             core.debug('Fetching short-lived token...');
-            const tokens = await getToken(develocityAccessKey, develocityTokenExpiry);
+            const tokens = await getToken(develocityAccessKey, develocityTokenExpiry, develocityAllowUntrustedServer);
             if (tokens != null && !tokens.isEmpty()) {
                 core.debug(`Got token(s), setting the access key env vars`);
                 const token = tokens.raw();
@@ -185413,10 +184292,10 @@ function handleMissingAccessToken() {
         core.warning(`The ${configuration_1.BuildScanConfig.DevelocityAccessKeyEnvVar} env var should be mapped to a short-lived token`);
     }
 }
-async function getToken(accessKey, expiry) {
+async function getToken(accessKey, expiry, develocityAllowUntrustedServer) {
     const empty = new Promise(r => r(null));
     const develocityAccessKey = DevelocityAccessCredentials.parse(accessKey);
-    const shortLivedTokenClient = new ShortLivedTokenClient();
+    const shortLivedTokenClient = new ShortLivedTokenClient(develocityAllowUntrustedServer);
     if (develocityAccessKey == null) {
         return empty;
     }
@@ -185437,10 +184316,12 @@ async function getToken(accessKey, expiry) {
     return empty;
 }
 class ShortLivedTokenClient {
-    constructor() {
-        this.httpc = new httpm.HttpClient('gradle/actions/setup-gradle');
+    constructor(develocityAllowUntrustedServer) {
         this.maxRetries = 3;
         this.retryInterval = 1000;
+        this.httpc = new httpm.HttpClient('gradle/actions/setup-gradle', undefined, {
+            ignoreSslError: develocityAllowUntrustedServer
+        });
     }
     async fetchToken(serverUrl, accessKey, expiry) {
         const queryParams = expiry ? `?expiresInHours=${expiry}` : '';
@@ -209099,7 +207980,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"@actions/artifact","version":
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"name":"@actions/cache","version":"4.0.0","preview":true,"description":"Actions cache lib","keywords":["github","actions","cache"],"homepage":"https://github.com/actions/toolkit/tree/main/packages/cache","license":"MIT","main":"lib/cache.js","types":"lib/cache.d.ts","directories":{"lib":"lib","test":"__tests__"},"files":["lib","!.DS_Store"],"publishConfig":{"access":"public"},"repository":{"type":"git","url":"git+https://github.com/actions/toolkit.git","directory":"packages/cache"},"scripts":{"audit-moderate":"npm install && npm audit --json --audit-level=moderate > audit.json","test":"echo \\"Error: run tests from root\\" && exit 1","tsc":"tsc"},"bugs":{"url":"https://github.com/actions/toolkit/issues"},"dependencies":{"@actions/core":"^1.11.1","@actions/exec":"^1.0.1","@actions/glob":"^0.1.0","@actions/http-client":"^2.1.1","@actions/io":"^1.0.1","@azure/abort-controller":"^1.1.0","@azure/ms-rest-js":"^2.6.0","@azure/storage-blob":"^12.13.0","@protobuf-ts/plugin":"^2.9.4","semver":"^6.3.1","twirp-ts":"^2.5.0"},"devDependencies":{"@types/semver":"^6.0.0","typescript":"^5.2.2"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"@actions/cache","version":"4.0.1","preview":true,"description":"Actions cache lib","keywords":["github","actions","cache"],"homepage":"https://github.com/actions/toolkit/tree/main/packages/cache","license":"MIT","main":"lib/cache.js","types":"lib/cache.d.ts","directories":{"lib":"lib","test":"__tests__"},"files":["lib","!.DS_Store"],"publishConfig":{"access":"public"},"repository":{"type":"git","url":"git+https://github.com/actions/toolkit.git","directory":"packages/cache"},"scripts":{"audit-moderate":"npm install && npm audit --json --audit-level=moderate > audit.json","test":"echo \\"Error: run tests from root\\" && exit 1","tsc":"tsc"},"bugs":{"url":"https://github.com/actions/toolkit/issues"},"dependencies":{"@actions/core":"^1.11.1","@actions/exec":"^1.0.1","@actions/glob":"^0.1.0","@actions/http-client":"^2.1.1","@actions/io":"^1.0.1","@azure/abort-controller":"^1.1.0","@azure/ms-rest-js":"^2.6.0","@azure/storage-blob":"^12.13.0","@protobuf-ts/plugin":"^2.9.4","semver":"^6.3.1"},"devDependencies":{"@types/semver":"^6.0.0","typescript":"^5.2.2"}}');
 
 /***/ }),
 
